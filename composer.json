@@ -1,0 +1,12 @@
+{
+  "name": "brinda/abstract-filter-query",
+  "description": "Abstract filter query lib for use only one query builder for all filters in the world (SQL, Youtrack search, jql...)",
+  "require": {
+    "php": "^7.3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "AFQ\\" : "src/"
+    }
+  }
+}
