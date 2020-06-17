@@ -2,7 +2,9 @@
   "name": "brinda/abstract-filter-query",
   "description": "Abstract filter query lib for use only one query builder for all filters in the world (SQL, Youtrack search, jql...)",
   "require": {
-    "php": "^7.3.0"
+    "php": "^7.3.0",
+    "ext-mbstring": "*",
+    "phpunit/phpunit": "9.2.3"
   },
   "autoload": {
     "psr-4": {

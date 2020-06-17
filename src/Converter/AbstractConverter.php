@@ -24,6 +24,6 @@ abstract class AbstractConverter
             $result .= $this->convertSoring($filterQuery->getSorting());
         }
 
-        return $result;
+        return trim($result);
     }
 }
