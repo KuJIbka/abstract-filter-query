@@ -19,6 +19,7 @@ use AFQ\Comparison\NotIn;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
 use AFQ\Sorting\Sorting;
+use DateTimeInterface;
 
 class FilterBlockToYoutrackConverter extends AbstractConverter
 {
@@ -76,15 +77,15 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
             case Between::class:
                 /** @var Between $abstractOperation */
                 return $abstractOperation->getKey() . ': '
-                    . $abstractOperation->getMin()
+                    . $this->convertValue($abstractOperation->getMin())
                     . ' .. '
-                    . $abstractOperation->getMax();
+                    . $this->convertValue($abstractOperation->getMax());
 
             case CloseDateBetween::class:
                 /** @var CloseDateBetween $abstractOperation */
-                $dateString = date('Y-m-d_H:i', $abstractOperation->getFrom());
+                $dateString = $this->convertValue($abstractOperation->getFrom());
                 if ($abstractOperation->getTo()) {
-                    $dateString .= ' .. ' . date('Y-m-d_H:i', $abstractOperation->getTo());
+                    $dateString .= ' .. ' . $this->convertValue($abstractOperation->getTo());
                 }
                 return 'дата завершения: ' . $dateString;
 
@@ -96,7 +97,7 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
                 /** @var WithTag $abstractOperation */
                 $parts = [];
                 foreach ($abstractOperation->getTags() as $tag) {
-                    $parts[] = "{$tag}";
+                    $parts[] = "{$this->convertValue($tag)}";
                 }
                 return 'тег: ' . implode(',', $parts);
 
@@ -104,7 +105,7 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
                 /** @var WithTag $abstractOperation */
                 $parts = [];
                 foreach ($abstractOperation->getTags() as $tag) {
-                    $parts[] = "{$tag}";
+                    $parts[] = "{$this->convertValue($tag)}";
                 }
                 return 'тег: -' . implode(',-', $parts);
         }
@@ -148,6 +149,11 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
 
             return $values;
         }
+        if ($value instanceof DateTimeInterface) {
+            /** @var DateTimeInterface $value */
+            return $value->format('Y-m-d\TH:i');
+        }
+
         if (strpos($value, ' ') !== false) {
             return '{' . $value . '}';
         }

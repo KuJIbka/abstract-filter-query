@@ -3,29 +3,25 @@
 
 namespace AFQ\Comparison;
 
+use DateTimeImmutable;
+
 class CloseDateBetween extends AbstractOperation
 {
     protected $from;
     protected $to;
 
-    public function __construct(int $from, int $to = null)
+    public function __construct(DateTimeImmutable $from, DateTimeImmutable $to = null)
     {
         $this->from = $from;
         $this->to = $to;
     }
 
-    /**
-     * @return int
-     */
-    public function getFrom(): int
+    public function getFrom(): DateTimeImmutable
     {
         return $this->from;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getTo(): ?int
+    public function getTo(): ?DateTimeImmutable
     {
         return $this->to;
     }

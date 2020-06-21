@@ -5,6 +5,7 @@ namespace Youtrack;
 
 use AFQ\Block\AndFilterBlock;
 use AFQ\Comparison\Between;
+use AFQ\Comparison\CloseDateBetween;
 use AFQ\Comparison\Equal;
 use AFQ\Comparison\In;
 use AFQ\Comparison\IsEmpty;
@@ -17,6 +18,7 @@ use AFQ\Comparison\WithTag;
 use AFQ\Converter\FilterBlockToYoutrackConverter;
 use AFQ\FilterQuery;
 use AFQ\Sorting\Sorting;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -226,6 +228,26 @@ class FilterBlockToYoutrackConverterTest extends TestCase
             '(тег: tag1,tag2)',
             $filterQueryString,
             'Youtrack WithTag operation failed'
+        );
+    }
+
+    public function testCloseDateBetween()
+    {
+        $from = mktime(0, 0, 0, 1, 1, 2020);
+        $to = mktime(2, 2, 2, 2, 2, 2022);
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new CloseDateBetween(
+                    (new DateTimeImmutable())->setTimestamp($from),
+                    (new DateTimeImmutable())->setTimestamp($to)
+                )
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(дата завершения: 2020-01-01T00:00 .. 2022-02-02T02:02)',
+            $filterQueryString,
+            'Youtrack Between operation failed'
         );
     }
 
