@@ -4,9 +4,12 @@
 namespace Youtrack;
 
 use AFQ\Block\AndFilterBlock;
+use AFQ\Block\OrFilterBlock;
 use AFQ\Comparison\Between;
 use AFQ\Comparison\CloseDateBetween;
 use AFQ\Comparison\Equal;
+use AFQ\Comparison\IdIn;
+use AFQ\Comparison\IdNotIn;
 use AFQ\Comparison\In;
 use AFQ\Comparison\IsEmpty;
 use AFQ\Comparison\IsOpen;
@@ -248,6 +251,76 @@ class FilterBlockToYoutrackConverterTest extends TestCase
             '(дата завершения: 2020-01-01T00:00 .. 2022-02-02T02:02)',
             $filterQueryString,
             'Youtrack Between operation failed'
+        );
+    }
+
+    public function testIdInOperation()
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new IdIn(['SITE-1234', 'SITE-4321']),
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(id задачи: SITE-1234,SITE-4321)',
+            $filterQueryString,
+            'Youtrack WithTag operation failed'
+        );
+    }
+
+    public function testIdNotInOperation()
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new IdNotIn(['SITE-1234', 'SITE-4321']),
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(someKey1: someValue1 и someKey2: someValue2)',
+            $filterQueryString,
+            'Youtrack WithTag operation failed'
+        );
+    }
+
+    public function testAndFilterBlock()
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new Equal('someKey1', 'someValue1'),
+                new Equal('someKey2', 'someValue2'),
+                new AndFilterBlock([
+                    new Equal('someKey3', 'someValue3'),
+                    new Equal('someKey4', 'someValue4'),
+                ])
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(someKey1: someValue1 и someKey2: someValue2 и (someKey3: someValue3 и someKey4: someValue4))',
+            $filterQueryString,
+            'Youtrack WithTag operation failed'
+        );
+    }
+
+    public function testOrFilterBlock()
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new OrFilterBlock([
+                new Equal('someKey1', 'someValue1'),
+                new Equal('someKey2', 'someValue2'),
+                new OrFilterBlock([
+                    new Equal('someKey3', 'someValue3'),
+                    new Equal('someKey4', 'someValue4'),
+                ])
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(someKey1: someValue1 или someKey2: someValue2 или (someKey3: someValue3 или someKey4: someValue4))',
+            $filterQueryString,
+            'Youtrack WithTag operation failed'
         );
     }
 

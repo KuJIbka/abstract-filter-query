@@ -10,6 +10,8 @@ use AFQ\Comparison\AbstractOperation;
 use AFQ\Comparison\Between;
 use AFQ\Comparison\CloseDateBetween;
 use AFQ\Comparison\Equal;
+use AFQ\Comparison\IdIn;
+use AFQ\Comparison\IdNotIn;
 use AFQ\Comparison\In;
 use AFQ\Comparison\IsEmpty;
 use AFQ\Comparison\IsOpen;
@@ -108,6 +110,22 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
                     $parts[] = "{$this->convertValue($tag)}";
                 }
                 return 'тег: -' . implode(',-', $parts);
+
+            case IdIn::class:
+                /** @var IdIn $abstractOperation */
+                $parts = [];
+                foreach ($abstractOperation->getValue() as $value) {
+                    $parts[] = "{$this->convertValue($value)}";
+                }
+                return 'id задачи: ' . implode(',', $parts);
+
+            case IdNotIn::class:
+                /** @var IdNotIn $abstractOperation */
+                $parts = [];
+                foreach ($abstractOperation->getValue() as $value) {
+                    $parts[] = "{$this->convertValue($value)}";
+                }
+                return 'id задачи: -' . implode(',-', $parts);
         }
 
         return '';
