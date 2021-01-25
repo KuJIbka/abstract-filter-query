@@ -18,6 +18,7 @@ use AFQ\Comparison\IsOpen;
 use AFQ\Comparison\NotEmpty;
 use AFQ\Comparison\NotEqual;
 use AFQ\Comparison\NotIn;
+use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
 use AFQ\Sorting\Sorting;
@@ -90,6 +91,14 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
                     $dateString .= ' .. ' . $this->convertValue($abstractOperation->getTo());
                 }
                 return 'дата завершения: ' . $dateString;
+
+            case UpdateDateBetween::class:
+                /** @var UpdateDateBetween $abstractOperation */
+                $dateString = $this->convertValue($abstractOperation->getFrom());
+                if ($abstractOperation->getTo()) {
+                    $dateString .= ' .. ' . $this->convertValue($abstractOperation->getTo());
+                }
+                return 'обновлена: ' . $dateString;
 
             case IsOpen::class:
                 /** @var IsOpen $abstractOperation */

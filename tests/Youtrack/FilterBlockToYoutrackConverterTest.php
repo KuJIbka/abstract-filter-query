@@ -16,6 +16,7 @@ use AFQ\Comparison\IsOpen;
 use AFQ\Comparison\NotEmpty;
 use AFQ\Comparison\NotEqual;
 use AFQ\Comparison\NotIn;
+use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
 use AFQ\Converter\FilterBlockToYoutrackConverter;
@@ -234,6 +235,40 @@ class FilterBlockToYoutrackConverterTest extends TestCase
         );
     }
 
+    public function testUpdateDateBetween()
+    {
+        $from = mktime(0, 0, 0, 1, 1, 2020);
+        $to = mktime(2, 2, 2, 2, 2, 2022);
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new UpdateDateBetween(
+                    (new DateTimeImmutable())->setTimestamp($from),
+                    (new DateTimeImmutable())->setTimestamp($to)
+                )
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(обновлена: 2020-01-01T00:00 .. 2022-02-02T02:02)',
+            $filterQueryString,
+            'Youtrack update date between operation failed (from ... to)'
+        );
+
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new UpdateDateBetween(
+                    (new DateTimeImmutable())->setTimestamp($from)
+                )
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(обновлена: 2020-01-01T00:00)',
+            $filterQueryString,
+            'Youtrack update date between operation failed (only from)'
+        );
+    }
+
     public function testCloseDateBetween()
     {
         $from = mktime(0, 0, 0, 1, 1, 2020);
@@ -250,7 +285,21 @@ class FilterBlockToYoutrackConverterTest extends TestCase
         $this->assertEquals(
             '(дата завершения: 2020-01-01T00:00 .. 2022-02-02T02:02)',
             $filterQueryString,
-            'Youtrack Between operation failed'
+            'Youtrack close date Between operation failed (from ... to)'
+        );
+
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new CloseDateBetween(
+                    (new DateTimeImmutable())->setTimestamp($from)
+                )
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(дата завершения: 2020-01-01T00:00)',
+            $filterQueryString,
+            'Youtrack close date between operation failed (only from)'
         );
     }
 
