@@ -16,6 +16,7 @@ use AFQ\Comparison\IsOpen;
 use AFQ\Comparison\NotEmpty;
 use AFQ\Comparison\NotEqual;
 use AFQ\Comparison\NotIn;
+use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
@@ -330,6 +331,20 @@ class FilterBlockToYoutrackConverterTest extends TestCase
             '(someKey1: someValue1 и someKey2: someValue2)',
             $filterQueryString,
             'Youtrack WithTag operation failed'
+        );
+    }
+
+    public function testRawStringOperation()
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new RawString('some query string'),
+            ]));
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            'some query string',
+            $filterQueryString,
+            'Youtrack RawString operation failed'
         );
     }
 
