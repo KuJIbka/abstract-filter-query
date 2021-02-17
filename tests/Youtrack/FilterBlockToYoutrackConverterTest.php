@@ -16,6 +16,7 @@ use AFQ\Comparison\IsOpen;
 use AFQ\Comparison\NotEmpty;
 use AFQ\Comparison\NotEqual;
 use AFQ\Comparison\NotIn;
+use AFQ\Comparison\Project;
 use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
@@ -328,9 +329,23 @@ class FilterBlockToYoutrackConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
         $this->assertEquals(
-            '(someKey1: someValue1 и someKey2: someValue2)',
+            '(id задачи: -SITE-1234,-SITE-4321)',
             $filterQueryString,
-            'Youtrack WithTag operation failed'
+            'Youtrack IdNotIn operation failed'
+        );
+    }
+
+    public function testProjectOperation()
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new Project('someProject'),
+            ]));
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(проект: someProject)',
+            $filterQueryString,
+            'Youtrack Project operation failed'
         );
     }
 
@@ -342,7 +357,7 @@ class FilterBlockToYoutrackConverterTest extends TestCase
             ]));
         $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
         $this->assertEquals(
-            'some query string',
+            '(some query string)',
             $filterQueryString,
             'Youtrack RawString operation failed'
         );

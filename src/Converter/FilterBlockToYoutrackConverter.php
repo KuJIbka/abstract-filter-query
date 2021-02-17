@@ -3,8 +3,8 @@
 
 namespace AFQ\Converter;
 
-use AFQ\Block\AndFilterBlock;
 use AFQ\Block\AbstractFilterBlock;
+use AFQ\Block\AndFilterBlock;
 use AFQ\Block\OrFilterBlock;
 use AFQ\Comparison\AbstractOperation;
 use AFQ\Comparison\Between;
@@ -18,6 +18,7 @@ use AFQ\Comparison\IsOpen;
 use AFQ\Comparison\NotEmpty;
 use AFQ\Comparison\NotEqual;
 use AFQ\Comparison\NotIn;
+use AFQ\Comparison\Project;
 use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
@@ -136,6 +137,9 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
                     $parts[] = "{$this->convertValue($value)}";
                 }
                 return 'id задачи: -' . implode(',-', $parts);
+            case Project::class:
+                /** @var Project $abstractOperation */
+                return 'проект: ' . $abstractOperation->getValue();
             case RawString::class:
                 /** @var RawString $abstractOperation */
                 return  $abstractOperation->getValue();
