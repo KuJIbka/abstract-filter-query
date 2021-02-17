@@ -18,7 +18,7 @@ use AFQ\Comparison\IsOpen;
 use AFQ\Comparison\NotEmpty;
 use AFQ\Comparison\NotEqual;
 use AFQ\Comparison\NotIn;
-use AFQ\Comparison\Project;
+use AFQ\Comparison\ProjectIn;
 use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
@@ -137,9 +137,13 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
                     $parts[] = "{$this->convertValue($value)}";
                 }
                 return 'id задачи: -' . implode(',-', $parts);
-            case Project::class:
-                /** @var Project $abstractOperation */
-                return 'проект: ' . $abstractOperation->getValue();
+            case ProjectIn::class:
+                /** @var ProjectIn $abstractOperation */
+                $parts = [];
+                foreach ($abstractOperation->getValue() as $value) {
+                    $parts[] = "{$this->convertValue($value)}";
+                }
+                return 'проект: ' . implode(',', $parts);
             case RawString::class:
                 /** @var RawString $abstractOperation */
                 return  $abstractOperation->getValue();

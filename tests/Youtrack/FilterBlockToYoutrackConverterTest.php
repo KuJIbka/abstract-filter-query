@@ -16,7 +16,7 @@ use AFQ\Comparison\IsOpen;
 use AFQ\Comparison\NotEmpty;
 use AFQ\Comparison\NotEqual;
 use AFQ\Comparison\NotIn;
-use AFQ\Comparison\Project;
+use AFQ\Comparison\ProjectIn;
 use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
@@ -335,17 +335,17 @@ class FilterBlockToYoutrackConverterTest extends TestCase
         );
     }
 
-    public function testProjectOperation()
+    public function testProjectInOperation()
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(new AndFilterBlock([
-                new Project('someProject'),
+                new ProjectIn(['someProject', 'someProject_2']),
             ]));
         $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
         $this->assertEquals(
-            '(проект: someProject)',
+            '(проект: someProject,someProject_2)',
             $filterQueryString,
-            'Youtrack Project operation failed'
+            'Youtrack ProjectIn operation failed'
         );
     }
 
