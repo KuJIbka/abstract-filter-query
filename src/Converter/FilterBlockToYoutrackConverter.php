@@ -73,7 +73,7 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
 
             case NotEmpty::class:
                 /** @var NotEmpty $abstractOperation */
-                return 'имеет: ' . $abstractOperation->getKey();
+                return 'имеет: ' . $this->convertValue($abstractOperation->getKey());
 
             case NotEqual::class:
                 /** @var NotEqual $abstractOperation */

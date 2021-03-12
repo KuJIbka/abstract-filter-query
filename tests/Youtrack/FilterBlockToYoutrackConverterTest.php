@@ -162,6 +162,21 @@ class FilterBlockToYoutrackConverterTest extends TestCase
         );
     }
 
+    public function testNotEmptyOperationWithHavingSpacesValue()
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(new AndFilterBlock([
+                new NotEmpty('field key'),
+            ]));
+
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $this->assertEquals(
+            '(имеет: {field key})',
+            $filterQueryString,
+            'Youtrack NotEmpty operation failed'
+        );
+    }
+
     public function testIsEmptyOperation()
     {
         $filterQuery = (new FilterQuery())
