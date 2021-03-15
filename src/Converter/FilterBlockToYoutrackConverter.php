@@ -190,7 +190,7 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
         }
         if ($value instanceof DateTimeInterface) {
             /** @var DateTimeInterface $value */
-            return $value->format('Y-m-d\TH:i');
+            return $value->format('Y-m-d_H:i');
         }
 
         if (strpos($value, ' ') !== false) {

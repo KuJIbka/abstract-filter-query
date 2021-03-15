@@ -266,7 +266,7 @@ class FilterBlockToYoutrackConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
         $this->assertEquals(
-            '(обновлена: 2020-01-01T00:00 .. 2022-02-02T02:02)',
+            '(обновлена: 2020-01-01_00:00 .. 2022-02-02_02:02)',
             $filterQueryString,
             'Youtrack update date between operation failed (from ... to)'
         );
@@ -280,7 +280,7 @@ class FilterBlockToYoutrackConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
         $this->assertEquals(
-            '(обновлена: 2020-01-01T00:00)',
+            '(обновлена: 2020-01-01_00:00)',
             $filterQueryString,
             'Youtrack update date between operation failed (only from)'
         );
@@ -300,7 +300,7 @@ class FilterBlockToYoutrackConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
         $this->assertEquals(
-            '(дата завершения: 2020-01-01T00:00 .. 2022-02-02T02:02)',
+            '(дата завершения: 2020-01-01_00:00 .. 2022-02-02_02:02)',
             $filterQueryString,
             'Youtrack close date Between operation failed (from ... to)'
         );
@@ -314,7 +314,7 @@ class FilterBlockToYoutrackConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
         $this->assertEquals(
-            '(дата завершения: 2020-01-01T00:00)',
+            '(дата завершения: 2020-01-01_00:00)',
             $filterQueryString,
             'Youtrack close date between operation failed (only from)'
         );
