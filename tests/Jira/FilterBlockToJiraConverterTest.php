@@ -1,6 +1,6 @@
 <?php
 
-namespace Youtrack;
+namespace Jira;
 
 use AFQ\Block\AndFilterBlock;
 use AFQ\Block\OrFilterBlock;
@@ -21,38 +21,38 @@ use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
-use AFQ\Converter\FilterBlockToYoutrackConverter;
+use AFQ\Converter\FilterBlockToJiraConverter;
 use AFQ\FilterQuery;
 use AFQ\Sorting\Sorting;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
-class FilterBlockToYoutrackConverterTest extends TestCase
+class FilterBlockToJiraConverterTest extends TestCase
 {
-    /** @var FilterBlockToYoutrackConverter */
-    protected $filterBlockToYoutrackConverter;
+    /** @var FilterBlockToJiraConverter */
+    protected $filterBlockToJiraConverter;
 
     protected function setUp(): void
     {
-        $this->filterBlockToYoutrackConverter = new FilterBlockToYoutrackConverter();
+        $this->filterBlockToJiraConverter = new FilterBlockToJiraConverter();
     }
 
-    public function testConvertValue()
+    public function testConvertValue(): void
     {
-        $method = new ReflectionMethod($this->filterBlockToYoutrackConverter, 'convertValue');
+        $method = new ReflectionMethod($this->filterBlockToJiraConverter, 'convertValue');
         $method->setAccessible(true);
 
         self::assertEquals(
             'someValue',
-            $method->invokeArgs($this->filterBlockToYoutrackConverter, ['someValue']),
-            'Youtrack convert value'
+            $method->invokeArgs($this->filterBlockToJiraConverter, ['someValue']),
+            'Jira convert value'
         );
 
         self::assertEquals(
-            '{some separated value}',
-            $method->invokeArgs($this->filterBlockToYoutrackConverter, ['some separated value']),
-            'Youtrack convert value'
+            '"some separated value"',
+            $method->invokeArgs($this->filterBlockToJiraConverter, ['some separated value']),
+            'Jira convert value'
         );
 
         self::assertEquals(
@@ -60,27 +60,27 @@ class FilterBlockToYoutrackConverterTest extends TestCase
             implode(
                 ',',
                 $method->invokeArgs(
-                    $this->filterBlockToYoutrackConverter,
+                    $this->filterBlockToJiraConverter,
                     [['someValue1', 'someValue2']]
                 )
             ),
-            'Youtrack convert value'
+            'Jira convert value'
         );
 
         self::assertEquals(
-            '{some separated value 1},{some separated value 2}',
+            '"some separated value 1","some separated value 2"',
             implode(
                 ',',
                 $method->invokeArgs(
-                    $this->filterBlockToYoutrackConverter,
+                    $this->filterBlockToJiraConverter,
                     [['some separated value 1', 'some separated value 2']]
                 )
             ),
-            'Youtrack convert value'
+            'Jira convert value'
         );
     }
 
-    public function testBetweenOperation()
+    public function testBetweenOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -91,15 +91,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey: 0 .. 100)',
+            '(fieldKey >= 0 and fieldKey <= 100)',
             $filterQueryString,
-            'Youtrack Between operation failed'
+            'Jira Between operation failed'
         );
     }
 
-    public function testEqualOperation()
+    public function testEqualOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -110,15 +110,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey: value)',
+            '(fieldKey = value)',
             $filterQueryString,
-            'Youtrack Equal operation failed'
+            'Jira Equal operation failed'
         );
     }
 
-    public function testInOperation()
+    public function testInOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -129,15 +129,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey: value1,value2,value3)',
+            '(fieldKey in (value1,value2,value3))',
             $filterQueryString,
-            'Youtrack IN operation failed'
+            'Jira IN operation failed'
         );
     }
 
-    public function testIsOpenOperation()
+    public function testIsOpenOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -148,11 +148,11 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(#Незавершенная)',
+            '(resolved is empty)',
             $filterQueryString,
-            'Youtrack IsOpen (true) operation failed'
+            'Jira IsOpen (true) operation failed'
         );
 
         $filterQuery = (new FilterQuery())
@@ -164,15 +164,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(#Завершенная)',
+            '(resolved is not empty)',
             $filterQueryString,
-            'Youtrack IsOpen (false) operation failed'
+            'Jira IsOpen (false) operation failed'
         );
     }
 
-    public function testNotEmptyOperation()
+    public function testNotEmptyOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -183,34 +183,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(имеет: fieldKey)',
+            '(fieldKey is not empty)',
             $filterQueryString,
-            'Youtrack NotEmpty operation failed'
+            'Jira NotEmpty operation failed'
         );
     }
 
-    public function testNotEmptyOperationWithHavingSpacesValue()
-    {
-        $filterQuery = (new FilterQuery())
-            ->setFilterBlock(
-                new AndFilterBlock(
-                    [
-                        new NotEmpty('field key'),
-                    ]
-                )
-            );
-
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
-        self::assertEquals(
-            '(имеет: {field key})',
-            $filterQueryString,
-            'Youtrack NotEmpty operation failed'
-        );
-    }
-
-    public function testIsEmptyOperation()
+    public function testIsEmptyOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -221,15 +202,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(имеет: : {-fieldkey})',
+            '(fieldKey is empty)',
             $filterQueryString,
-            'Youtrack IsEmpty operation failed'
+            'Jira IsEmpty operation failed'
         );
     }
 
-    public function testNotEqualOperation()
+    public function testNotEqualOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -240,15 +221,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey: -value)',
+            '(fieldKey != value)',
             $filterQueryString,
-            'Youtrack NotEqual operation failed'
+            'Jira NotEqual operation failed'
         );
     }
 
-    public function testNotInOperation()
+    public function testNotInOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -259,15 +240,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey: -value1,-value2)',
+            '(fieldKey not in (value1,value2))',
             $filterQueryString,
-            'Youtrack NotIn operation failed'
+            'Jira NotIn operation failed'
         );
     }
 
-    public function testWithOutTagOperation()
+    public function testWithOutTagOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -278,15 +259,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(тег: -tag1,-tag2)',
+            '(labels not in (tag1,tag2))',
             $filterQueryString,
-            'Youtrack WithOutTag operation failed'
+            'Jira WithOutTag operation failed'
         );
     }
 
-    public function testWithTagOperation()
+    public function testWithTagOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -297,15 +278,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(тег: tag1,tag2)',
+            '(labels in (tag1,tag2))',
             $filterQueryString,
-            'Youtrack WithTag operation failed'
+            'Jira WithTag operation failed'
         );
     }
 
-    public function testUpdateDateBetween()
+    public function testUpdateDateBetween(): void
     {
         $from = mktime(0, 0, 0, 1, 1, 2020);
         $to = mktime(2, 2, 2, 2, 2, 2022);
@@ -321,15 +302,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(обновлена: 2020-01-01_00:00 .. 2022-02-02_02:02)',
+            '(updated >= "2020-01-01 00:00" and updated <= "2022-02-02 02:02")',
             $filterQueryString,
-            'Youtrack update date between operation failed (from ... to)'
+            'Jira update date between operation failed (from ... to)'
         );
     }
 
-    public function testCreateDateBetween()
+    public function testCreateDateBetween(): void
     {
         $from = mktime(0, 0, 0, 1, 1, 2020);
         $to = mktime(2, 2, 2, 2, 2, 2022);
@@ -345,15 +326,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(создана: 2020-01-01_00:00 .. 2022-02-02_02:02)',
+            '(created >= "2020-01-01 00:00" and created <= "2022-02-02 02:02")',
             $filterQueryString,
-            'Youtrack create date between operation failed (from ... to)'
+            'Jira create date between operation failed (from ... to)'
         );
     }
 
-    public function testCloseDateBetween()
+    public function testCloseDateBetween(): void
     {
         $from = mktime(0, 0, 0, 1, 1, 2020);
         $to = mktime(2, 2, 2, 2, 2, 2022);
@@ -369,15 +350,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(дата завершения: 2020-01-01_00:00 .. 2022-02-02_02:02)',
+            '(resolved >= "2020-01-01 00:00" and resolved <= "2022-02-02 02:02")',
             $filterQueryString,
-            'Youtrack close date Between operation failed (from ... to)'
+            'Jira close date Between operation failed (from ... to)'
         );
     }
 
-    public function testIdInOperation()
+    public function testIdInOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -388,15 +369,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(id задачи: SITE-1234,SITE-4321)',
+            '(issueKey in (SITE-1234,SITE-4321))',
             $filterQueryString,
-            'Youtrack WithTag operation failed'
+            'Jira WithTag operation failed'
         );
     }
 
-    public function testIdNotInOperation()
+    public function testIdNotInOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -407,15 +388,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(id задачи: -SITE-1234,-SITE-4321)',
+            '(issueKey not in (SITE-1234,SITE-4321))',
             $filterQueryString,
-            'Youtrack IdNotIn operation failed'
+            'Jira IdNotIn operation failed'
         );
     }
 
-    public function testProjectInOperation()
+    public function testProjectInOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -425,15 +406,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                     ]
                 )
             );
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(проект: someProject,someProject_2)',
+            '(project in (someProject,someProject_2))',
             $filterQueryString,
-            'Youtrack ProjectIn operation failed'
+            'Jira ProjectIn operation failed'
         );
     }
 
-    public function testRawStringOperation()
+    public function testRawStringOperation(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -443,15 +424,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                     ]
                 )
             );
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
             '(some query string)',
             $filterQueryString,
-            'Youtrack RawString operation failed'
+            'Jira RawString operation failed'
         );
     }
 
-    public function testAndFilterBlock()
+    public function testAndFilterBlock(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -469,15 +450,15 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(someKey1: someValue1 и someKey2: someValue2 и (someKey3: someValue3 и someKey4: someValue4))',
+            '(someKey1 = someValue1 and someKey2 = someValue2 and (someKey3 = someValue3 and someKey4 = someValue4))',
             $filterQueryString,
-            'Youtrack WithTag operation failed'
+            'Jira AndFilterBlock operation failed'
         );
     }
 
-    public function testOrFilterBlock()
+    public function testOrFilterBlock(): void
     {
         $filterQuery = (new FilterQuery())
             ->setFilterBlock(
@@ -495,24 +476,24 @@ class FilterBlockToYoutrackConverterTest extends TestCase
                 )
             );
 
-        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(someKey1: someValue1 или someKey2: someValue2 или (someKey3: someValue3 или someKey4: someValue4))',
+            '(someKey1 = someValue1 or someKey2 = someValue2 or (someKey3 = someValue3 or someKey4 = someValue4))',
             $filterQueryString,
-            'Youtrack WithTag operation failed'
+            'Jira WithTag operation failed'
         );
     }
 
-    public function testSorting()
+    public function testSorting(): void
     {
-        $method = new ReflectionMethod($this->filterBlockToYoutrackConverter, 'convertSoring');
+        $method = new ReflectionMethod($this->filterBlockToJiraConverter, 'convertSoring');
         $method->setAccessible(true);
 
         $sorting = new Sorting([['someKey', Sorting::ASC]]);
         self::assertEquals(
-            'Сортировать: someKey по возр.',
-            $method->invokeArgs($this->filterBlockToYoutrackConverter, [$sorting]),
-            'Youtrack convert value'
+            'order by someKey asc',
+            $method->invokeArgs($this->filterBlockToJiraConverter, [$sorting]),
+            'Jira convert value'
         );
 
         $sorting = new Sorting(
@@ -522,9 +503,50 @@ class FilterBlockToYoutrackConverterTest extends TestCase
             ]
         );
         self::assertEquals(
-            'Сортировать: someKey по убыв.,someKey2 по возр.',
-            $method->invokeArgs($this->filterBlockToYoutrackConverter, [$sorting]),
-            'Youtrack convert value'
+            'order by someKey desc,someKey2 asc',
+            $method->invokeArgs($this->filterBlockToJiraConverter, [$sorting]),
+            'Jira sorting'
+        );
+    }
+
+    public function testSomeComplexVariants(): void
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock
+            (
+                new OrFilterBlock(
+                    [
+                        new AndFilterBlock(
+                            [
+                                new ProjectIn(['SIT']),
+                                new UpdateDateBetween(new DateTimeImmutable('2020-01-02'), new DateTimeImmutable('2020-01-20')),
+                                new IsOpen(true),
+                            ]
+                        ),
+                        new AndFilterBlock(
+                            [
+                                new ProjectIn(['SIT']),
+                                new CloseDateBetween(new DateTimeImmutable('2020-01-02'), new DateTimeImmutable('2020-01-20')),
+                                new IsOpen(false),
+                            ]
+                        ),
+                    ]
+                )
+            )
+            ->setSorting(
+                new Sorting(
+                    [
+                        ['updated', Sorting::DESC],
+                        ['resolved', Sorting::ASC],
+                    ]
+                )
+            )
+        ;
+
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
+        self::assertEquals(
+            '((project in (SIT) and updated >= "2020-01-02 00:00" and updated <= "2020-01-20 00:00" and resolved is empty) or (project in (SIT) and resolved >= "2020-01-02 00:00" and resolved <= "2020-01-20 00:00" and resolved is not empty)) order by updated desc,resolved asc',
+            $filterQueryString
         );
     }
 }

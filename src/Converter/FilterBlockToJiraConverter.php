@@ -26,7 +26,7 @@ use AFQ\Comparison\WithTag;
 use AFQ\Sorting\Sorting;
 use DateTimeInterface;
 
-class FilterBlockToYoutrackConverter extends AbstractConverter
+class FilterBlockToJiraConverter extends AbstractConverter
 {
     protected function convertBlock(AbstractFilterBlock $abstractFilterBlock): string
     {
@@ -41,9 +41,9 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
         }
 
         if ($abstractFilterBlock instanceof AndFilterBlock) {
-            $result = '(' . implode(' и ', $partsAsString) . ')';
+            $result = '(' . implode(' and ', $partsAsString) . ')';
         } elseif ($abstractFilterBlock instanceof OrFilterBlock) {
-            $result = '(' . implode(' или ', $partsAsString) . ')';
+            $result = '(' . implode(' or ', $partsAsString) . ')';
         }
 
         return $result;
@@ -55,102 +55,98 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
         switch ($className) {
             case Equal::class:
                 /** @var Equal $abstractOperation */
-                return $abstractOperation->getKey() . ': ' . $this->convertValue($abstractOperation->getValue());
+                return $abstractOperation->getKey() . ' = ' . $this->convertValue($abstractOperation->getValue());
 
             case In::class:
                 /** @var In $abstractOperation */
-                return $abstractOperation->getKey() . ': '
-                    . implode(',', $this->convertValue($abstractOperation->getValue()));
+                return $abstractOperation->getKey() . ' in ('
+                    . implode(',', $this->convertValue($abstractOperation->getValue())) . ')';
 
             case NotIn::class:
                 /** @var NotIn $abstractOperation */
-                return $abstractOperation->getKey() . ': -'
-                    . implode(',-', $this->convertValue($abstractOperation->getValue()));
+                return $abstractOperation->getKey() . ' not in ('
+                    . implode(',', $this->convertValue($abstractOperation->getValue())) . ')';
 
             case IsEmpty::class:
                 /** @var IsEmpty $abstractOperation */
-                return 'имеет: : {-' . mb_strtolower($abstractOperation->getKey()) . '}';
+                return $abstractOperation->getKey() . ' is empty';
 
             case NotEmpty::class:
                 /** @var NotEmpty $abstractOperation */
-                return 'имеет: ' . $this->convertValue($abstractOperation->getKey());
+                return $abstractOperation->getKey() . ' is not empty';
 
             case NotEqual::class:
                 /** @var NotEqual $abstractOperation */
-                return $abstractOperation->getKey() . ': -' . $this->convertValue($abstractOperation->getValue());
+                return $abstractOperation->getKey() . ' != ' . $this->convertValue($abstractOperation->getValue());
 
             case Between::class:
                 /** @var Between $abstractOperation */
-                return $abstractOperation->getKey() . ': '
+                return $abstractOperation->getKey() . ' >= '
                     . $this->convertValue($abstractOperation->getMin())
-                    . ' .. '
+                    . ' and ' . $abstractOperation->getKey() . ' <= '
                     . $this->convertValue($abstractOperation->getMax());
-
-            case CloseDateBetween::class:
-                /** @var CloseDateBetween $abstractOperation */
-                $dateString = $this->convertValue($abstractOperation->getFrom()) . ' .. ' . $this->convertValue($abstractOperation->getTo());
-
-                return 'дата завершения: ' . $dateString;
 
             case CreateDateBetween::class:
                 /** @var CreateDateBetween $abstractOperation */
-                $dateString = $this->convertValue($abstractOperation->getFrom()) . ' .. ' . $this->convertValue($abstractOperation->getTo());
-
-                return 'создана: ' . $dateString;
+                return 'created >= ' . $this->convertValue($abstractOperation->getFrom())
+                    . ' and created <= ' . $this->convertValue($abstractOperation->getTo());
+            case CloseDateBetween::class:
+                /** @var CloseDateBetween $abstractOperation */
+                return 'resolved >= ' . $this->convertValue($abstractOperation->getFrom())
+                    . ' and resolved <= ' . $this->convertValue($abstractOperation->getTo());
 
             case UpdateDateBetween::class:
                 /** @var UpdateDateBetween $abstractOperation */
-                $dateString = $this->convertValue($abstractOperation->getFrom()) . ' .. ' . $this->convertValue($abstractOperation->getTo());
-
-                return 'обновлена: ' . $dateString;
+                return 'updated >= ' . $this->convertValue($abstractOperation->getFrom())
+                    . ' and updated <= ' . $this->convertValue($abstractOperation->getTo());
 
             case IsOpen::class:
                 /** @var IsOpen $abstractOperation */
-                return $abstractOperation->isOpen() ? '#Незавершенная' : '#Завершенная';
+                return $abstractOperation->isOpen() ? 'resolved is empty' : 'resolved is not empty';
 
             case WithTag::class:
                 /** @var WithTag $abstractOperation */
                 $parts = [];
                 foreach ($abstractOperation->getTags() as $tag) {
-                    $parts[] = "{$this->convertValue($tag)}";
+                    $parts[] = (string) ($this->convertValue($tag));
                 }
 
-                return 'тег: ' . implode(',', $parts);
+                return 'labels in (' . implode(',', $parts) . ')';
 
             case WithOutTag::class:
                 /** @var WithTag $abstractOperation */
                 $parts = [];
                 foreach ($abstractOperation->getTags() as $tag) {
-                    $parts[] = "{$this->convertValue($tag)}";
+                    $parts[] = (string) ($this->convertValue($tag));
                 }
 
-                return 'тег: -' . implode(',-', $parts);
+                return 'labels not in (' . implode(',', $parts) . ')';
 
             case IdIn::class:
                 /** @var IdIn $abstractOperation */
                 $parts = [];
                 foreach ($abstractOperation->getValue() as $value) {
-                    $parts[] = "{$this->convertValue($value)}";
+                    $parts[] = (string) ($this->convertValue($value));
                 }
 
-                return 'id задачи: ' . implode(',', $parts);
+                return 'issueKey in (' . implode(',', $parts) . ')';
 
             case IdNotIn::class:
                 /** @var IdNotIn $abstractOperation */
                 $parts = [];
                 foreach ($abstractOperation->getValue() as $value) {
-                    $parts[] = "{$this->convertValue($value)}";
+                    $parts[] = (string) ($this->convertValue($value));
                 }
 
-                return 'id задачи: -' . implode(',-', $parts);
+                return 'issueKey not in (' . implode(',', $parts) . ')';
             case ProjectIn::class:
                 /** @var ProjectIn $abstractOperation */
                 $parts = [];
                 foreach ($abstractOperation->getValue() as $value) {
-                    $parts[] = "{$this->convertValue($value)}";
+                    $parts[] = (string) ($this->convertValue($value));
                 }
 
-                return 'проект: ' . implode(',', $parts);
+                return 'project in (' . implode(',', $parts) . ')';
             case RawString::class:
                 /** @var RawString $abstractOperation */
                 return $abstractOperation->getValue();
@@ -166,16 +162,16 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
             $parts[] = $part[0] . ' ' . $this->geAscDescString($part[1]);
         }
 
-        return 'Сортировать: ' . implode(',', $parts);
+        return 'order by ' . implode(',', $parts);
     }
 
     protected function geAscDescString($sort): string
     {
         switch ($sort) {
             case Sorting::ASC:
-                return 'по возр.';
+                return 'asc';
             case Sorting::DESC:
-                return 'по убыв.';
+                return 'desc';
         }
 
         return '';
@@ -198,11 +194,11 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
         }
         if ($value instanceof DateTimeInterface) {
             /** @var DateTimeInterface $value */
-            return $value->format('Y-m-d_H:i');
+            return '"' . $value->format('Y-m-d H:i') . '"';
         }
 
         if (strpos($value, ' ') !== false) {
-            return '{' . $value . '}';
+            return '"' . $value . '"';
         }
 
         return $value;
