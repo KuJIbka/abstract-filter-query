@@ -408,7 +408,7 @@ class FilterBlockToJiraConverterTest extends TestCase
             );
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(project in (someProject,someProject_2))',
+            '(project in ("someProject","someProject_2"))',
             $filterQueryString,
             'Jira ProjectIn operation failed'
         );
@@ -545,7 +545,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '((project in (SIT) and updated >= "2020-01-02 00:00" and updated <= "2020-01-20 00:00" and resolved is empty) or (project in (SIT) and resolved >= "2020-01-02 00:00" and resolved <= "2020-01-20 00:00" and resolved is not empty)) order by updated desc,resolved asc',
+            '((project in ("SIT") and updated >= "2020-01-02 00:00" and updated <= "2020-01-20 00:00" and resolved is empty) or (project in ("SIT") and resolved >= "2020-01-02 00:00" and resolved <= "2020-01-20 00:00" and resolved is not empty)) order by updated desc,resolved asc',
             $filterQueryString
         );
     }

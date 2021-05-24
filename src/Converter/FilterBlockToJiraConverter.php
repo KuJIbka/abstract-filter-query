@@ -143,7 +143,7 @@ class FilterBlockToJiraConverter extends AbstractConverter
                 /** @var ProjectIn $abstractOperation */
                 $parts = [];
                 foreach ($abstractOperation->getValue() as $value) {
-                    $parts[] = (string) ($this->convertValue($value));
+                    $parts[] = '"' . $this->convertValue($value) . '"';
                 }
 
                 return 'project in (' . implode(',', $parts) . ')';
