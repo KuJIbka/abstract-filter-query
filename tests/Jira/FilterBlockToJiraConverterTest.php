@@ -2,8 +2,10 @@
 
 namespace Jira;
 
+use AFQ\Block\AbstractFilterBlock;
 use AFQ\Block\AndFilterBlock;
 use AFQ\Block\OrFilterBlock;
+use AFQ\Comparison\AbstractDateBetween;
 use AFQ\Comparison\Between;
 use AFQ\Comparison\CloseDateBetween;
 use AFQ\Comparison\CreateDateBetween;
@@ -93,7 +95,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey >= 0 and fieldKey <= 100)',
+            '((fieldKey >= 0 and fieldKey <= 100))',
             $filterQueryString,
             'Jira Between operation failed'
         );
@@ -304,7 +306,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(updated >= "2020-01-01 00:00" and updated <= "2022-02-02 02:02")',
+            '((updated >= "2020-01-01 00:00" and updated <= "2022-02-02 02:02"))',
             $filterQueryString,
             'Jira update date between operation failed (from ... to)'
         );
@@ -328,7 +330,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(created >= "2020-01-01 00:00" and created <= "2022-02-02 02:02")',
+            '((created >= "2020-01-01 00:00" and created <= "2022-02-02 02:02"))',
             $filterQueryString,
             'Jira create date between operation failed (from ... to)'
         );
@@ -352,7 +354,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(resolved >= "2020-01-01 00:00" and resolved <= "2022-02-02 02:02")',
+            '((resolved >= "2020-01-01 00:00" and resolved <= "2022-02-02 02:02"))',
             $filterQueryString,
             'Jira close date Between operation failed (from ... to)'
         );
@@ -545,7 +547,41 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '((project in ("SIT") and updated >= "2020-01-02 00:00" and updated <= "2020-01-20 00:00" and resolved is empty) or (project in ("SIT") and resolved >= "2020-01-02 00:00" and resolved <= "2020-01-20 00:00" and resolved is not empty)) order by updated desc,resolved asc',
+            '((project in ("SIT") and (updated >= "2020-01-02 00:00" and updated <= "2020-01-20 00:00") and resolved is empty) or (project in ("SIT") and (resolved >= "2020-01-02 00:00" and resolved <= "2020-01-20 00:00") and resolved is not empty)) order by updated desc,resolved asc',
+            $filterQueryString
+        );
+    }
+
+    public function testOrInsideAndVariant(): void
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock
+            (
+                new AndFilterBlock(
+                    [
+                        new ProjectIn(['PROJECT']),
+                        new OrFilterBlock(
+                            [
+                                new UpdateDateBetween(new DateTimeImmutable('2020-01-02'), new DateTimeImmutable('2020-01-20')),
+                                new CreateDateBetween(new DateTimeImmutable('2020-01-02'), new DateTimeImmutable('2020-01-20')),
+                            ]
+                        )
+                    ]
+                )
+            )
+            ->setSorting(
+                new Sorting(
+                    [
+                        ['updated', Sorting::DESC],
+                        ['resolved', Sorting::ASC],
+                    ]
+                )
+            )
+        ;
+
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
+        self::assertEquals(
+            '(project in ("PROJECT") and ((updated >= "2020-01-02 00:00" and updated <= "2020-01-20 00:00") or (created >= "2020-01-02 00:00" and created <= "2020-01-20 00:00"))) order by updated desc,resolved asc',
             $filterQueryString
         );
     }

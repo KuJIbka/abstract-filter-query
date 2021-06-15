@@ -81,24 +81,24 @@ class FilterBlockToJiraConverter extends AbstractConverter
 
             case Between::class:
                 /** @var Between $abstractOperation */
-                return $abstractOperation->getKey() . ' >= '
+                return '('.$abstractOperation->getKey() . ' >= '
                     . $this->convertValue($abstractOperation->getMin())
                     . ' and ' . $abstractOperation->getKey() . ' <= '
-                    . $this->convertValue($abstractOperation->getMax());
+                    . $this->convertValue($abstractOperation->getMax()).')';
 
             case CreateDateBetween::class:
                 /** @var CreateDateBetween $abstractOperation */
-                return 'created >= ' . $this->convertValue($abstractOperation->getFrom())
-                    . ' and created <= ' . $this->convertValue($abstractOperation->getTo());
+                return '(created >= ' . $this->convertValue($abstractOperation->getFrom())
+                    . ' and created <= ' . $this->convertValue($abstractOperation->getTo()).')';
             case CloseDateBetween::class:
                 /** @var CloseDateBetween $abstractOperation */
-                return 'resolved >= ' . $this->convertValue($abstractOperation->getFrom())
-                    . ' and resolved <= ' . $this->convertValue($abstractOperation->getTo());
+                return '(resolved >= ' . $this->convertValue($abstractOperation->getFrom())
+                    . ' and resolved <= ' . $this->convertValue($abstractOperation->getTo()).')';
 
             case UpdateDateBetween::class:
                 /** @var UpdateDateBetween $abstractOperation */
-                return 'updated >= ' . $this->convertValue($abstractOperation->getFrom())
-                    . ' and updated <= ' . $this->convertValue($abstractOperation->getTo());
+                return '(updated >= ' . $this->convertValue($abstractOperation->getFrom())
+                    . ' and updated <= ' . $this->convertValue($abstractOperation->getTo()).')';
 
             case IsOpen::class:
                 /** @var IsOpen $abstractOperation */
