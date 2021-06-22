@@ -55,35 +55,35 @@ class FilterBlockToJiraConverter extends AbstractConverter
         switch ($className) {
             case Equal::class:
                 /** @var Equal $abstractOperation */
-                return $abstractOperation->getKey() . ' = ' . $this->convertValue($abstractOperation->getValue());
+                return '"'.$abstractOperation->getKey() . '" = ' . $this->convertValue($abstractOperation->getValue());
 
             case In::class:
                 /** @var In $abstractOperation */
-                return $abstractOperation->getKey() . ' in ('
+                return '"'.$abstractOperation->getKey() . '" in ('
                     . implode(',', $this->convertValue($abstractOperation->getValue())) . ')';
 
             case NotIn::class:
                 /** @var NotIn $abstractOperation */
-                return $abstractOperation->getKey() . ' not in ('
+                return '"'.$abstractOperation->getKey() . '" not in ('
                     . implode(',', $this->convertValue($abstractOperation->getValue())) . ')';
 
             case IsEmpty::class:
                 /** @var IsEmpty $abstractOperation */
-                return $abstractOperation->getKey() . ' is empty';
+                return '"'.$abstractOperation->getKey() . '" is empty';
 
             case NotEmpty::class:
                 /** @var NotEmpty $abstractOperation */
-                return $abstractOperation->getKey() . ' is not empty';
+                return '"'. $abstractOperation->getKey() . '" is not empty';
 
             case NotEqual::class:
                 /** @var NotEqual $abstractOperation */
-                return $abstractOperation->getKey() . ' != ' . $this->convertValue($abstractOperation->getValue());
+                return '"'. $abstractOperation->getKey() . '" != ' . $this->convertValue($abstractOperation->getValue());
 
             case Between::class:
                 /** @var Between $abstractOperation */
-                return '('.$abstractOperation->getKey() . ' >= '
+                return '("'.$abstractOperation->getKey() . '" >= '
                     . $this->convertValue($abstractOperation->getMin())
-                    . ' and ' . $abstractOperation->getKey() . ' <= '
+                    . ' and "' . $abstractOperation->getKey() . '" <= '
                     . $this->convertValue($abstractOperation->getMax()).')';
 
             case CreateDateBetween::class:

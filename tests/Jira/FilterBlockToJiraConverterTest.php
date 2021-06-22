@@ -95,7 +95,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '((fieldKey >= 0 and fieldKey <= 100))',
+            '(("fieldKey" >= 0 and "fieldKey" <= 100))',
             $filterQueryString,
             'Jira Between operation failed'
         );
@@ -114,7 +114,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey = value)',
+            '("fieldKey" = value)',
             $filterQueryString,
             'Jira Equal operation failed'
         );
@@ -133,7 +133,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey in (value1,value2,value3))',
+            '("fieldKey" in (value1,value2,value3))',
             $filterQueryString,
             'Jira IN operation failed'
         );
@@ -187,7 +187,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey is not empty)',
+            '("fieldKey" is not empty)',
             $filterQueryString,
             'Jira NotEmpty operation failed'
         );
@@ -206,7 +206,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey is empty)',
+            '("fieldKey" is empty)',
             $filterQueryString,
             'Jira IsEmpty operation failed'
         );
@@ -225,7 +225,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey != value)',
+            '("fieldKey" != value)',
             $filterQueryString,
             'Jira NotEqual operation failed'
         );
@@ -244,7 +244,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(fieldKey not in (value1,value2))',
+            '("fieldKey" not in (value1,value2))',
             $filterQueryString,
             'Jira NotIn operation failed'
         );
@@ -454,7 +454,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(someKey1 = someValue1 and someKey2 = someValue2 and (someKey3 = someValue3 and someKey4 = someValue4))',
+            '("someKey1" = someValue1 and "someKey2" = someValue2 and ("someKey3" = someValue3 and "someKey4" = someValue4))',
             $filterQueryString,
             'Jira AndFilterBlock operation failed'
         );
@@ -480,7 +480,7 @@ class FilterBlockToJiraConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(someKey1 = someValue1 or someKey2 = someValue2 or (someKey3 = someValue3 or someKey4 = someValue4))',
+            '("someKey1" = someValue1 or "someKey2" = someValue2 or ("someKey3" = someValue3 or "someKey4" = someValue4))',
             $filterQueryString,
             'Jira WithTag operation failed'
         );
