@@ -223,7 +223,7 @@ class FilterBlockToYoutrackConverterTest extends TestCase
 
         $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
         self::assertEquals(
-            '(имеет: : {-fieldkey})',
+            '(имеет: -{fieldkey})',
             $filterQueryString,
             'Youtrack IsEmpty operation failed'
         );

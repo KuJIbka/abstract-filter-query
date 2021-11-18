@@ -69,7 +69,7 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
 
             case IsEmpty::class:
                 /** @var IsEmpty $abstractOperation */
-                return 'имеет: : {-' . mb_strtolower($abstractOperation->getKey()) . '}';
+                return 'имеет: -{' . mb_strtolower($abstractOperation->getKey()) . '}';
 
             case NotEmpty::class:
                 /** @var NotEmpty $abstractOperation */
