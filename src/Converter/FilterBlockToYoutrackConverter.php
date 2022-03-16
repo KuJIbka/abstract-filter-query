@@ -209,16 +209,8 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
         return $value;
     }
 
-    public function convertFilterQuery(FilterQuery $filterQuery): string
+    protected function getOrderBySeparator(): string
     {
-        $result = '';
-        if ($filterQuery->getFilterBlock()) {
-            $result = $this->convertBlock($filterQuery->getFilterBlock()) . ' ';
-        }
-        if ($filterQuery->getSorting()) {
-            $result .= 'и '.$this->convertSoring($filterQuery->getSorting());
-        }
-
-        return trim($result);
+        return ' и ';
     }
 }

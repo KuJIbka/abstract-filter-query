@@ -14,11 +14,19 @@ abstract class AbstractConverter
     abstract protected function convertOperation(AbstractOperation $abstractOperation): string;
     abstract protected function convertSoring(Sorting $sorting): string;
 
+    protected function getOrderBySeparator(): string
+    {
+        return '';
+    }
+
     public function convertFilterQuery(FilterQuery $filterQuery): string
     {
         $result = '';
         if ($filterQuery->getFilterBlock()) {
             $result = $this->convertBlock($filterQuery->getFilterBlock()) . ' ';
+        }
+        if ($result !== '' && $this->getOrderBySeparator() !== '' && $filterQuery->getSorting()) {
+            $result .= $this->getOrderBySeparator();
         }
         if ($filterQuery->getSorting()) {
             $result .= $this->convertSoring($filterQuery->getSorting());
