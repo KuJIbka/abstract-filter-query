@@ -23,6 +23,7 @@ use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
+use AFQ\FilterQuery;
 use AFQ\Sorting\Sorting;
 use DateTimeInterface;
 
@@ -206,5 +207,18 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
         }
 
         return $value;
+    }
+
+    public function convertFilterQuery(FilterQuery $filterQuery): string
+    {
+        $result = '';
+        if ($filterQuery->getFilterBlock()) {
+            $result = $this->convertBlock($filterQuery->getFilterBlock()) . ' ';
+        }
+        if ($filterQuery->getSorting()) {
+            $result .= 'и '.$this->convertSoring($filterQuery->getSorting());
+        }
+
+        return trim($result);
     }
 }
