@@ -527,4 +527,28 @@ class FilterBlockToYoutrackConverterTest extends TestCase
             'Youtrack convert value'
         );
     }
+
+    public function testSortingWithFilter()
+    {
+        $filterQuery = (new FilterQuery())
+            ->setFilterBlock(
+                new AndFilterBlock(
+                    [
+                        new RawString('some query string'),
+                    ]
+                )
+            )->setSorting(new Sorting(
+                [
+                    ['someKey', Sorting::DESC],
+                    ['someKey2', Sorting::ASC],
+                ]
+            ))
+        ;
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        self::assertEquals(
+            '(some query string)  и Сортировать: someKey по убыв.,someKey2 по возр.',
+            $filterQueryString,
+            'Youtrack sorting with filter error'
+        );
+    }
 }
