@@ -21,6 +21,7 @@ use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
+use AFQ\Comparison\WorkItemAuthors;
 use AFQ\Converter\FilterBlockToYoutrackConverter;
 use AFQ\FilterQuery;
 use AFQ\Sorting\Sorting;
@@ -448,6 +449,21 @@ class FilterBlockToYoutrackConverterTest extends TestCase
             '(some query string)',
             $filterQueryString,
             'Youtrack RawString operation failed'
+        );
+    }
+
+    public function testWorkItemAuthors()
+    {
+        $filterQuery = new FilterQuery(new AndFilterBlock(
+            [
+                new WorkItemAuthors(['AuthorOne', 'AuthorTwo']),
+            ]
+        ));
+        $filterQueryString = $this->filterBlockToYoutrackConverter->convertFilterQuery($filterQuery);
+        self::assertEquals(
+            '(автор работы: AuthorOne,AuthorTwo)',
+            $filterQueryString,
+            'Youtrack WorkItemAuthors operation failed'
         );
     }
 

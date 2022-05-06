@@ -7,8 +7,11 @@ use AFQ\Sorting\Sorting;
 
 class FilterQuery
 {
-    protected $filterBlock;
-    protected $sorting;
+    public function __construct(
+        protected ?AbstractFilterBlock $filterBlock = null,
+        protected ?Sorting $sorting = null
+    ) {
+    }
 
     public function setFilterBlock(AbstractFilterBlock $abstractFilterBlock)
     {
@@ -17,7 +20,7 @@ class FilterQuery
         return $this;
     }
 
-    public function getFilterBlock()
+    public function getFilterBlock(): ?AbstractFilterBlock
     {
         return $this->filterBlock;
     }
@@ -29,7 +32,7 @@ class FilterQuery
         return $this;
     }
 
-    public function getSorting()
+    public function getSorting(): ?Sorting
     {
         return $this->sorting;
     }

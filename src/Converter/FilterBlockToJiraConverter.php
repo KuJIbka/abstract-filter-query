@@ -23,6 +23,7 @@ use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
+use AFQ\Comparison\WorkItemAuthors;
 use AFQ\Sorting\Sorting;
 use DateTimeInterface;
 
@@ -150,6 +151,14 @@ class FilterBlockToJiraConverter extends AbstractConverter
             case RawString::class:
                 /** @var RawString $abstractOperation */
                 return $abstractOperation->getValue();
+
+            case WorkItemAuthors::class:
+                /** @var WorkItemAuthors $abstractOperation */
+                $parts = [];
+                foreach ($abstractOperation->getValue() as $value) {
+                    $parts[] = '"' . $this->convertValue($value) . '"';
+                }
+                return 'worklogAuthor in (' . implode(',', $parts) . ')';
         }
 
         return '';
