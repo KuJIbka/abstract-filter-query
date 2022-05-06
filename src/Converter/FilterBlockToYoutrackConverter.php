@@ -23,7 +23,7 @@ use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
-use AFQ\FilterQuery;
+use AFQ\Comparison\WorkItemAuthors;
 use AFQ\Sorting\Sorting;
 use DateTimeInterface;
 
@@ -155,6 +155,10 @@ class FilterBlockToYoutrackConverter extends AbstractConverter
             case RawString::class:
                 /** @var RawString $abstractOperation */
                 return $abstractOperation->getValue();
+
+            case WorkItemAuthors::class:
+                /** @var WorkItemAuthors $abstractOperation */
+                return 'автор работы: ' . implode(',', $this->convertValue($abstractOperation->getValue()));
         }
 
         return '';

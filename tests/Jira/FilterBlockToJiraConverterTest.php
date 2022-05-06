@@ -2,10 +2,8 @@
 
 namespace Jira;
 
-use AFQ\Block\AbstractFilterBlock;
 use AFQ\Block\AndFilterBlock;
 use AFQ\Block\OrFilterBlock;
-use AFQ\Comparison\AbstractDateBetween;
 use AFQ\Comparison\Between;
 use AFQ\Comparison\CloseDateBetween;
 use AFQ\Comparison\CreateDateBetween;
@@ -23,6 +21,7 @@ use AFQ\Comparison\RawString;
 use AFQ\Comparison\UpdateDateBetween;
 use AFQ\Comparison\WithOutTag;
 use AFQ\Comparison\WithTag;
+use AFQ\Comparison\WorkItemAuthors;
 use AFQ\Converter\FilterBlockToJiraConverter;
 use AFQ\FilterQuery;
 use AFQ\Sorting\Sorting;
@@ -431,6 +430,21 @@ class FilterBlockToJiraConverterTest extends TestCase
             '(some query string)',
             $filterQueryString,
             'Jira RawString operation failed'
+        );
+    }
+
+    public function testWorkItemAuthors(): void
+    {
+        $filterQuery = new FilterQuery(new AndFilterBlock(
+            [
+                new WorkItemAuthors(['AuthorOne', 'AuthorTwo']),
+            ]
+        ));
+        $filterQueryString = $this->filterBlockToJiraConverter->convertFilterQuery($filterQuery);
+        self::assertEquals(
+            '(worklogAuthor in ("AuthorOne","AuthorTwo"))',
+            $filterQueryString,
+            'Jira WorkItemAuthors operation failed'
         );
     }
 
